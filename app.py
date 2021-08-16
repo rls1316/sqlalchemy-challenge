@@ -41,8 +41,10 @@ def home():
     Precipitation: /api/v1.0/precipitation<br>\
     Stations: /api/v1.0/stations<br>\
     TOBS: /api/v1.0/tobs<br>\
-    Start Date: /api/v1.0/<start><br>\
-    End Date: /api/v1.0/<start>/<end>")
+    Start Date*: /api/v1.0/'start'<br>\
+    *replace 'start' with date value prior to 2017-08-24 (ex. /api/v1.0/2016-01-01)<br>\
+    End Date*: /api/v1.0/'start'/'end'<br>\
+    *replace 'start' and 'end' with date values prior to 2017-08-24 (ex./api/v1.0/2016-01-01/2017-08-23)")
 
 # Precipitation Route
 @app.route("/api/v1.0/precipitation")
@@ -110,16 +112,66 @@ def tobs():
 
 # Start Date Route
 @app.route("/api/v1.0/<start>")
-def start():
+def startdate(start):
+    # Create engine
+    session = Session(engine)
     
-    return ""
+    # Create Query
+    Date_Validation = session.query(func.max(Measurement.date)).all()[0][0]
+    
+    if (start <= Date_Validation):
+        
+        Start_Temp_Data = session.query(func.min(Measurement.tobs),\
+                                        func.max(Measurement.tobs),\
+                                        func.avg(Measurement.tobs)).\
+        filter(Measurement.date >= start).all()
+    
+        session.close()
+    
+        # Create List 
+        Start_Temp_Data_List = list(Start_Temp_Data)
+        
+        #Successful Message
+        message = [f"The min, max, and avg temps for the defined start date are {Start_Temp_Data_List}"]
+    
+    # Complete else statement for Data Validation query
+    
+    else:
+        message = [f"Warning: Your Start Date is out of the data range, the max date is {Date_Validation}"]   
+    
+    return jsonify(message)
 
 # End Date Route
 @app.route("/api/v1.0/<start>/<end>")
-def end():
-    return ""
-
-
+def start_end(start,end):
+    # Create engine
+    session = Session(engine)
+    
+    # Create Query
+    Date_Validation = session.query(func.max(Measurement.date)).all()[0][0]
+    
+    if (start <= Date_Validation):
+        
+        Start_End_Temp_Data = session.query(func.min(Measurement.tobs),\
+                                        func.max(Measurement.tobs),\
+                                        func.avg(Measurement.tobs)).\
+        filter(Measurement.date >= start).\
+        filter(Measurement.date <= end).all()
+    
+        session.close()
+    
+        # Create List 
+        Start_End_Temp_Data_List = list(Start_End_Temp_Data)
+        
+        #Successful Message
+        message = [f"The min, max, and avg temps for the defined range {start} - {end} date are {Start_End_Temp_Data_List}"]
+    
+    # Complete else statement for Data Validation query
+    
+    else:
+        message = [f"Warning: Your Start Date is out of the data range, the max start date is {Date_Validation}"]   
+    
+    return jsonify(message)
 
 if __name__ == "__main__":
     app.run(debug = True)
