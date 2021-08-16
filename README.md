@@ -19,14 +19,14 @@ Results:
 
 * Design a query to calculate the total number of stations in the dataset.
 * Design a query to find the most active stations (i.e. which stations have the most rows?).
-** List the stations and observation counts in descending order.
-** Which station id has the highest number of observations?
-** Using the most active station id, calculate the lowest, highest, and average temperature.
+* * List the stations and observation counts in descending order.
+* * Which station id has the highest number of observations?
+* * Using the most active station id, calculate the lowest, highest, and average temperature.
 
 * Design a query to retrieve the last 12 months of temperature observation data (TOBS).
-** Filter by the station with the highest number of observations.
-** Query the last 12 months of temperature observation data for this station.
-** Plot the results as a histogram with bins=12.
+* * Filter by the station with the highest number of observations.
+* * Query the last 12 months of temperature observation data for this station.
+* * Plot the results as a histogram with bins=12.
 
 Results: 
 ![image](https://github.com/rls1316/sqlalchemy-challenge/blob/DataBootCamp/Output/Temperature_by_Frequency.png)
