@@ -7,8 +7,8 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 
-import numpy as NP
-import datetime as DT
+import numpy as np
+import datetime as dt
 
 ###################################################################
 # Database Setup
@@ -84,12 +84,34 @@ def station():
 
 # TOBS Route
 @app.route("/api/v1.0/tobs")
-def tobs():
-    return ""
+def tobs():  
+    # Create engine
+    session = Session(engine)
+      
+    # Define Dates
+    One_Year_Ago_Latest = dt.date(2017,8,23) - dt.timedelta(days = 365)
+    Latest_Date = dt.date(2017,8,23)
+    
+    # Create Queries
+    Most_Active_Station_Query = session.query(Measurement.station, func.count(Measurement.station)).\
+    group_by(Measurement.station).order_by(func.count(Measurement.station).desc()).all()[0][0]
+    
+    Most_Active_Station_Temp_Data = session.query(Measurement.date, Measurement.tobs).\
+    filter(Measurement.station == Most_Active_Station_Query).\
+    filter(Measurement.date >= One_Year_Ago_Latest).\
+    filter(Measurement.date <= Latest_Date).all()
+    
+    session.close()
+    
+    # Create List
+    Most_Active_Station_Temp_Data_List = list(Most_Active_Station_Temp_Data)
+    
+    return jsonify(Most_Active_Station_Temp_Data_List)
 
 # Start Date Route
 @app.route("/api/v1.0/<start>")
 def start():
+    
     return ""
 
 # End Date Route
